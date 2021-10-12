@@ -3,12 +3,18 @@ const ctx = canvas.getContext("2d");
 const colors = document.getElementsByClassName("jsColor");
 const range = document.getElementById("jsRange");
 const mode = document.getElementById("jsMode");
+const saveBtn = document.getElementById("jsSave");
 
 const INITIAL_COLOR = "#2c2c2c";
 const CANVAS_SIZE = 700;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
+
+// background default
+// 설정하지 않으면 배경색이 투명이라 이미지 저장 시 투명 이미지로 저장됨
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 ctx.strokeStyle = INITIAL_COLOR; // pen의 dafault color
 ctx.fillStyle = INITIAL_COLOR; //fill default color
@@ -67,12 +73,26 @@ function handleCanvasClick() {
   }
 }
 
+function handleCM(event) {
+  // 우클릭 방지 함수
+  event.preventDefault();
+}
+
+function handleSaveClick() {
+  const image = canvas.toDataURL();
+  const link = document.createElement("a");
+  link.href = image; // href에는 image(URL)이 들어가야 한다.
+  link.download = "PaintJS[EXPORT]"; // download에는 다운로드되는 이미지의 name을 지정한다.
+  link.click();
+}
+
 if (canvas) {
   canvas.addEventListener("mousemove", onMouseMove);
   canvas.addEventListener("mousedown", startPainting);
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
   canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("contextmenu", handleCM);
 }
 
 // 선택한 object의 style을 반환하여 array로 변환
@@ -86,4 +106,8 @@ if (range) {
 
 if (mode) {
   mode.addEventListener("click", handleModeClick);
+}
+
+if (saveBtn) {
+  saveBtn.addEventListener("click", handleSaveClick);
 }
