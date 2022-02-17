@@ -2,6 +2,18 @@
 const $ = (selector) => document.querySelector(selector);
 
 function App() {
+  $("#espresso-menu-list").addEventListener("click", (e) => {
+    if (e.target.classList.contains("menu-edit-button")) {
+      // 수정 버튼을 눌렀을 때
+      const $menuName = e.target.closest("li").querySelector(".menu-name");
+      const updatedMenuName = prompt(
+        "메뉴명을 수정하세요",
+        $menuName.innerText
+      );
+      $menuName.innerText = updatedMenuName;
+    }
+  });
+
   // form 태그가 자동으로 전송되는걸 막기
   $("#espresso-menu-form").addEventListener("submit", (e) =>
     e.preventDefault()
