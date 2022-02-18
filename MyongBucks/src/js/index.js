@@ -7,7 +7,7 @@ const store = {
     localStorage.setItem("menu", JSON.stringify(menu));
   },
   getLocalStorage() {
-    localStorage.getItem("menu");
+    return JSON.parse(localStorage.getItem("menu"));
   },
 };
 
@@ -16,45 +16,55 @@ function App() {
   // 초기화 해두면 해당 데이터가 어떤 형태로 관리되는지 한 눈에 볼 수 있다.
   this.menu = [];
 
+  // app 인스턴스가 새로 만들어질 때 사용할 메소드
+  this.init = () => {
+    // localStorage에 값이 있을 때 데이터 가져오기
+    if (store.getLocalStorage().length > 1) {
+      this.menu = store.getLocalStorage();
+    }
+    render();
+  };
+
+  // localStorage에서 가져온 데이터를 그려주는 메소드
+  const render = () => {
+    const template = this.menu
+      .map((item, index) => {
+        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+        <span class="w-100 pl-2 menu-name">${item.name}</span>
+        <button
+          type="button"
+          class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
+        >
+          수정
+        </button>
+        <button
+          type="button"
+          class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
+        >
+          삭제
+        </button>
+      </li>`;
+      })
+      .join("");
+    $("#espresso-menu-list").innerHTML = template;
+    updateMenuCount();
+  };
+
   const updateMenuCount = () => {
     const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
     $(".menu-count").innerText = `총 ${menuCount}개`;
   };
 
   const addMenuName = () => {
+    if ($("#espresso-menu-name").value === "") {
+      alert("값을 입력해주세요.");
+      return;
+    }
     const espressoMenuName = $("#espresso-menu-name").value;
-
     this.menu.push({ name: espressoMenuName });
     store.setLocalStorage(this.menu);
-
-    const template = this.menu
-      .map((item, index) => {
-        return `<li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-          <span class="w-100 pl-2 menu-name">${item.name}</span>
-          <button
-            type="button"
-            class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
-          >
-            수정
-          </button>
-          <button
-            type="button"
-            class="bg-gray-50 text-gray-500 text-sm menu-remove-button"
-          >
-            삭제
-          </button>
-        </li>`;
-      })
-      .join("");
-    if (espressoMenuName !== "") {
-      $("#espresso-menu-list").innerHTML = template;
-      updateMenuCount();
-      // 메뉴 입력 후 빈 값으로 초기화
-      $("#espresso-menu-name").value = "";
-    } else {
-      // input이 빈 값일 경우 alert 띄워주기
-      alert("값을 입력해주세요.");
-    }
+    render();
+    $("#espresso-menu-name").value = "";
   };
 
   const updateMenuName = (e) => {
@@ -104,3 +114,4 @@ function App() {
 }
 
 const app = new App();
+app.init();
