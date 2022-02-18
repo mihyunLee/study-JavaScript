@@ -1,7 +1,21 @@
 // DOM element
 const $ = (selector) => document.querySelector(selector);
 
+// localStorage 객체
+const store = {
+  setLocalStorage(menu) {
+    localStorage.setItem("menu", JSON.stringify(menu));
+  },
+  getLocalStorage() {
+    localStorage.getItem("menu");
+  },
+};
+
 function App() {
+  // 메뉴 상태
+  // 초기화 해두면 해당 데이터가 어떤 형태로 관리되는지 한 눈에 볼 수 있다.
+  this.menu = [];
+
   const updateMenuCount = () => {
     const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
     $(".menu-count").innerText = `총 ${menuCount}개`;
@@ -9,10 +23,14 @@ function App() {
 
   const addMenuName = () => {
     const espressoMenuName = $("#espresso-menu-name").value;
-    if (espressoMenuName !== "") {
-      const menuItemTemplate = (espressoMenuName) => {
+
+    this.menu.push({ name: espressoMenuName });
+    store.setLocalStorage(this.menu);
+
+    const template = this.menu
+      .map((item) => {
         return `<li class="menu-list-item d-flex items-center py-2">
-          <span class="w-100 pl-2 menu-name">${espressoMenuName}</span>
+          <span class="w-100 pl-2 menu-name">${item.name}</span>
           <button
             type="button"
             class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -26,13 +44,10 @@ function App() {
             삭제
           </button>
         </li>`;
-      };
-      // 리스트에 메뉴 추가하기
-      $("#espresso-menu-list").insertAdjacentHTML(
-        "beforeend",
-        menuItemTemplate(espressoMenuName)
-      );
-      // 총 개수 업데이트 하기
+      })
+      .join("");
+    if (espressoMenuName !== "") {
+      $("#espresso-menu-list").innerHTML = template;
       updateMenuCount();
       // 메뉴 입력 후 빈 값으로 초기화
       $("#espresso-menu-name").value = "";
@@ -82,4 +97,4 @@ function App() {
   });
 }
 
-App();
+const app = new App();
