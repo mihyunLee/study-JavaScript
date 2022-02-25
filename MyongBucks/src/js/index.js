@@ -42,6 +42,14 @@ function App() {
         <span class="w-100 pl-2 menu-name">${item.name}</span>
         <button
           type="button"
+          class="${
+            item.soldOut ? "sold-out" : ""
+          } bg-gray-50 text-gray-500 text-sm mr-1 menu-sold-out-button"
+        >
+          품절
+        </button>
+        <button
+          type="button"
           class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
         >
           수정
@@ -95,14 +103,30 @@ function App() {
     }
   };
 
+  const soldOutMenu = (e) => {
+    const menuId = e.target.closest("li").dataset.menuId;
+    this.menu[this.currentCategory][menuId].soldOut =
+      !this.menu[this.currentCategory][menuId].soldOut;
+    store.setLocalStorage(this.menu);
+    render();
+  };
+
   $("#menu-list").addEventListener("click", (e) => {
     if (e.target.classList.contains("menu-edit-button")) {
       // 수정 버튼을 눌렀을 때
       updateMenuName(e);
+      return;
     }
     if (e.target.classList.contains("menu-remove-button")) {
       // 삭제 버튼을 눌렀을 때
       removeMenuName(e);
+      return;
+    }
+
+    if (e.target.classList.contains("menu-sold-out-button")) {
+      // 품절 버튼을 눌렀을 때
+      soldOutMenu(e);
+      return;
     }
   });
 
