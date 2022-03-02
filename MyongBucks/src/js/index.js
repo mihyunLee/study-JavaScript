@@ -3,6 +3,13 @@ import store from "./store/index.js";
 
 const BASE_URL = "http://localhost:3000/api";
 
+const MenuApi = {
+  async getAllMenuByCategory(category) {
+    const response = await fetch(`${BASE_URL}/category/${category}/menu`);
+    return response.json();
+  },
+};
+
 function App() {
   // 메뉴 상태
   // 초기화 해두면 해당 데이터가 어떤 형태로 관리되는지 한 눈에 볼 수 있다.
@@ -18,11 +25,12 @@ function App() {
   this.currentCategory = "espresso";
 
   // app 인스턴스가 새로 만들어질 때 사용할 메소드
-  this.init = () => {
-    // localStorage에 값이 있을 때 데이터 가져오기
-    if (store.getLocalStorage()) {
-      this.menu = store.getLocalStorage();
-    }
+  this.init = async () => {
+    // 서버에서 카테고리에 따라서 메뉴 불러오기
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+    console.log(this.menu[this.currentCategory]); // undefined
     render();
     initEventListeners();
   };
@@ -83,15 +91,11 @@ function App() {
       return response.json();
     });
 
-    await fetch(`${BASE_URL}/category/${this.currentCategory}/menu`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        this.menu[this.currentCategory] = data;
-        render();
-        $("#menu-name").value = "";
-      });
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
+    render();
+    $("#menu-name").value = "";
   };
 
   const updateMenuName = (e) => {
